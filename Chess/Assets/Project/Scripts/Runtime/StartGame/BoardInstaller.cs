@@ -6,12 +6,15 @@ public class BoardInstaller : MonoInstaller
 {
     [SerializeField] private Board boardPrefab;
     [SerializeField] private Tile tilePrefab;
+    [SerializeField] private FigureConfig figureConfig;
 
     public override void InstallBindings()
     {
         BoardBind();
         BindTile();
         BoardGeneratorBind();
+        FigureConfigBind();
+        FigureGeneratorBind();
     }
     private void BoardBind()
     {
@@ -37,8 +40,21 @@ public class BoardInstaller : MonoInstaller
             .BindInterfacesAndSelfTo<TileGenerator>()
             .AsSingle()
             .NonLazy();
-
-    
+    }
+    private void FigureConfigBind()
+    {
+        Container
+            .Bind<FigureConfig>()
+            .FromInstance(figureConfig)
+            .AsSingle()
+            .NonLazy();
     }
 
+    private void FigureGeneratorBind()
+    {
+        Container
+            .BindInterfacesAndSelfTo<FigureGenerator>()
+            .AsSingle()
+            .NonLazy();
+    }
 }

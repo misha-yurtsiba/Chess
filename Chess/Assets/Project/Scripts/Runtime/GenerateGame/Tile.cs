@@ -13,7 +13,7 @@ public class Tile : MonoBehaviour
 
     public Team team;
 
-    private void OnMouseUpAsButton()
+    public void Active()
     {
         moveSprite.SetActive(true);
     }

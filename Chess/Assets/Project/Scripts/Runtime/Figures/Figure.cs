@@ -10,11 +10,12 @@ public abstract class Figure : MonoBehaviour
     public int zPos;
 
     protected Board gameBoard;
-    public void Init(int x,int z, Board board)
+    public void Init(int x,int z, Board board, Team team)
     {
         xPos = x;
         zPos = z;
         gameBoard = board;
+        this.team = team;
     }
 
     public abstract List<Tile> GetMoveTiles();

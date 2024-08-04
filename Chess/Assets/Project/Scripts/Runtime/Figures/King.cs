@@ -2,17 +2,15 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class King : MonoBehaviour
+public class King : Figure
 {
-    // Start is called before the first frame update
-    void Start()
+    public override List<Tile> GetAttackTiles()
     {
-        
+        throw new System.NotImplementedException();
     }
 
-    // Update is called once per frame
-    void Update()
+    public override List<Tile> GetMoveTiles()
     {
-        
+        throw new System.NotImplementedException();
     }
 }
