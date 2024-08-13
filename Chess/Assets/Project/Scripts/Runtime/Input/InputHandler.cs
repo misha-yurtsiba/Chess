@@ -1,4 +1,5 @@
 using System.Collections;
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
@@ -6,14 +7,16 @@ using UnityEngine.InputSystem;
 public class InputHandler : MonoBehaviour
 {
     private GameInput gameInput;
-    void Awake()
+
+    public event Action<Vector2> playetTouched;
+    void Start()
     {
         gameInput = new GameInput();
+        gameInput.Gameplay.Enable();
         gameInput.Gameplay.Click.performed += OnClick;
     }
     private void OnEnable()
     {
-        gameInput.Gameplay.Enable();
     }
     private void OnDisable()
     {
@@ -21,17 +24,8 @@ public class InputHandler : MonoBehaviour
     }
     private void OnClick(InputAction.CallbackContext context)
     {
-        Debug.Log("Click");
         Vector2 pos = context.action.ReadValue<Vector2>();
 
-        Ray ray = Camera.main.ScreenPointToRay(pos);
-
-        if(Physics.Raycast(ray,out RaycastHit hitInfo, 100))
-        {
-            if(hitInfo.transform.TryGetComponent(out Tile tile))
-            {
-                tile.Active();
-            }
-        }
+        playetTouched?.Invoke(pos);
     }
 }

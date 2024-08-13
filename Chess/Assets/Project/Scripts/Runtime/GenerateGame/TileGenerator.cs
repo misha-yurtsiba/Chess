@@ -33,6 +33,8 @@ public class TileGenerator :ITileGenerator
         Tile tile = diContainer
             .InstantiatePrefab(tilePrefab,new Vector3(xPos, offset, zPos),Quaternion.identity,null)
             .GetComponent<Tile>();
+
+        tile.Init(xPos,zPos);
         return tile;
     }
 }

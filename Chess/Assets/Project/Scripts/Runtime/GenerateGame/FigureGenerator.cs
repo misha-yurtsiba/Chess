@@ -48,7 +48,7 @@ public class FigureGenerator  : IFigureGeneator
         CreateOneFigure(7, 7, FigureType.Rook, Team.Black);
     }
 
-    private Figure CreateOneFigure(int xPos, int zPos,FigureType figureType,Team team)
+    private void CreateOneFigure(int xPos, int zPos,FigureType figureType,Team team)
     {
         Figure figure = diContainer.InstantiatePrefab
             (figureDict[figureType].figurePrefab,new Vector3(xPos,0,zPos),Quaternion.identity,null)
@@ -66,9 +66,7 @@ public class FigureGenerator  : IFigureGeneator
         }
 
         figure.Init(xPos, zPos, board, team);
-        board.board[zPos,zPos].team = team;
-        board.board[zPos,zPos].figure = figure;
-
-        return figure;
+        board.board[xPos, zPos].team = team;
+        board.board[xPos, zPos].figure = figure;
     }
 }

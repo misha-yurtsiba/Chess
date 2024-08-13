@@ -20,7 +20,8 @@ public class GamplayEntryPoint : MonoBehaviour
     {
         tileGenerator.GenerateTiles(board);
         figureGeneator.GenerateFigures();
+
     }
 
-    
+
 }

@@ -10,6 +10,10 @@ public abstract class Figure : MonoBehaviour
     public int zPos;
 
     protected Board gameBoard;
+
+    protected List<Tile> movingList = new List<Tile>(); 
+    protected List<Tile> attackList = new List<Tile>();
+
     public void Init(int x,int z, Board board, Team team)
     {
         xPos = x;
@@ -18,12 +22,40 @@ public abstract class Figure : MonoBehaviour
         this.team = team;
     }
 
-    public abstract List<Tile> GetMoveTiles();
-    public abstract List<Tile> GetAttackTiles();
+    
 
+    public abstract List<Tile> GetMoveTiles();
+    public List<Tile> GetAttackTiles()
+    {
+        return attackList;
+    }
+
+    virtual protected bool CheckMovingAndAttackLimitation(int x, int z)
+    {
+        if (x < 0 || x >= Board.X_COUNT || z < 0 || z >= Board.Y_COUNT) return false;
+
+        if (gameBoard.board[x, z].figure != null)
+        {
+            if (gameBoard.board[x, z].figure.team == team) return false;
+            else 
+            {
+                attackList.Add(gameBoard.board[x,z]);
+                return false;
+            } 
+        }
+
+        return true;
+    }
+    protected void AddTile(int x, int z)
+    {
+        if (CheckMovingAndAttackLimitation(x, z))
+            movingList.Add(gameBoard.board[x, z]);
+    }
     public virtual void MoveTo(int x, int z)
     {
         transform.position = new Vector3(x, 0, z);
+        xPos = x;
+        zPos = z;
     }
 
     public void Lose() { }
