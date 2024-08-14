@@ -7,22 +7,25 @@ public class FigureMoveState : GameStateBase
     private InputHandler inputHandler;
     private Camera camera;
     private GameStateController stateController;
+    private CheckAndMateController checkAndMateController;
+
     private Tile activeTile;
     private List<Tile> figurePathList;
     private List<Tile> figureAttackList;
 
-    public FigureMoveState(InputHandler inputHandler, GameStateController stateController, Camera camera)
+    public FigureMoveState(InputHandler inputHandler, GameStateController stateController, Camera camera, CheckAndMateController checkAndMateController)
     {
         this.inputHandler = inputHandler;
         this.stateController = stateController;
         this.camera = camera;
+        this.checkAndMateController = checkAndMateController;
     }
     public override void Enter()
     {
         activeTile = stateController.activeTile;
 
         activeTile.SelectMarkerSetActive(true);
-        figurePathList = activeTile.figure.GetMoveTiles();
+        figurePathList = checkAndMateController.GetFigurePath(activeTile.figure, activeTile, activeTile.figure.GetMoveTiles());
         figureAttackList = activeTile.figure.GetAttackTiles();
         
         if(figurePathList != null)
@@ -73,7 +76,6 @@ public class FigureMoveState : GameStateBase
                 {
                     if(touchedTile.figure.team == activeTile.figure.team)
                     {
-                        Debug.Log($"touchetTeam: {touchedTile.figure.team} + activeTeam: {activeTile.team}");
                         stateController.activeTile.SelectMarkerSetActive(false);
                         stateController.activeTile = touchedTile;
                         stateController.ChangeState(stateController.figureMoveState);
@@ -94,7 +96,6 @@ public class FigureMoveState : GameStateBase
         {
             if (touchedTile == tile)
             {
-                Debug.Log(2);
                 activeTile.figure.MoveTo(touchedTile.xPos, touchedTile.zPos);
                 activeTile.SelectMarkerSetActive(false);                
                 ChangeTeam();
@@ -107,9 +108,6 @@ public class FigureMoveState : GameStateBase
                 return;
             }
         }
-
-
-        Debug.Log(3);
         activeTile.SelectMarkerSetActive(false);
         stateController.ChangeState(stateController.waitPlayerInputState);
 
@@ -121,7 +119,6 @@ public class FigureMoveState : GameStateBase
         {
             if(touchedTile == tile)
             {
-                Debug.Log(4);
                 activeTile.figure.MoveTo(touchedTile.xPos, touchedTile.zPos);
                 activeTile.SelectMarkerSetActive(false);
                 ChangeTeam();
@@ -135,10 +132,8 @@ public class FigureMoveState : GameStateBase
                 return;
             }
         }
-        Debug.Log(5);
         activeTile.SelectMarkerSetActive(false);
         stateController.ChangeState(stateController.waitPlayerInputState);
-
     }
 
     private void ChangeTeam()

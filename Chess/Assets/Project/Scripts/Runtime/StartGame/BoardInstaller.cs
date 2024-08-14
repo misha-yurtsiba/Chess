@@ -14,7 +14,9 @@ public class BoardInstaller : MonoInstaller
         BindTile();
         BoardGeneratorBind();
         FigureConfigBind();
+        CheckAndMateControllerBind();
         FigureGeneratorBind();
+        
     }
     private void BoardBind()
     {
@@ -49,6 +51,16 @@ public class BoardInstaller : MonoInstaller
             .AsSingle()
             .NonLazy();
     }
+    private void CheckAndMateControllerBind()
+    {
+
+        Container
+            .BindInterfacesAndSelfTo<CheckAndMateController>()
+            .AsSingle()
+            .NonLazy();
+        Debug.Log(111);
+    }
+
 
     private void FigureGeneratorBind()
     {

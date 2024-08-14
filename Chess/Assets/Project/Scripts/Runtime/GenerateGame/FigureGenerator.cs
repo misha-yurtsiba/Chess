@@ -7,13 +7,15 @@ public class FigureGenerator  : IFigureGeneator
     private FigureConfig figureConfig;
     private Board board;
     private DiContainer diContainer;
+    private CheckAndMateController checkAndMateController;
 
     private Dictionary<FigureType,FigureData> figureDict = new Dictionary<FigureType, FigureData>();
-    public FigureGenerator(FigureConfig figureConfig, Board board, DiContainer diContainer)
+    public FigureGenerator(FigureConfig figureConfig, Board board, DiContainer diContainer, CheckAndMateController checkAndMateController)
     {
         this.figureConfig = figureConfig;
         this.board = board;
         this.diContainer = diContainer;
+        this.checkAndMateController = checkAndMateController;
     }
 
     public void GenerateFigures()
@@ -58,11 +60,12 @@ public class FigureGenerator  : IFigureGeneator
         {
             figure.GetComponent<MeshRenderer>().material = figureDict[figureType].darkMaterial;
             figure.transform.rotation = Quaternion.Euler(0,180,0);
+            checkAndMateController.blackFigures.Add(figure);
         }
         else
         {
             figure.GetComponent<MeshRenderer>().material = figureDict[figureType].lightMaterial;
-
+            checkAndMateController.whiteFigures.Add(figure);
         }
 
         figure.Init(xPos, zPos, board, team);

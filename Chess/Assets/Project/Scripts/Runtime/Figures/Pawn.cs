@@ -5,13 +5,9 @@ using UnityEngine;
 public class Pawn : Figure
 {
     private bool isFirstMoving = true;
-
-    private List<Tile> attackList = new List<Tile>();
     public override List<Tile> GetMoveTiles()
     {
         movingList.Clear();
-        attackList.Clear();
-
 
         if (isFirstMoving)
         {
@@ -19,7 +15,7 @@ public class Pawn : Figure
             {
                 for (int i = 1; zPos + i < 4; i++)
                 {
-                    if (CheckMovingAndAttackLimitation(xPos, zPos + i))
+                    if (CheckMovingLimitation(xPos, zPos + i))
                     {
                         movingList.Add(gameBoard.board[xPos, zPos + i]);
                     }
@@ -31,7 +27,7 @@ public class Pawn : Figure
             {
                 for (int i = 1; zPos - i > 3; i++)
                 {
-                    if (CheckMovingAndAttackLimitation(xPos, zPos - i))
+                    if (CheckMovingLimitation(xPos, zPos - i))
                     {
                         movingList.Add(gameBoard.board[xPos, zPos - i]);
                     }
@@ -50,21 +46,47 @@ public class Pawn : Figure
 
         return movingList;
     }
+
+    public override List<Tile> GetAttackTiles()
+    {
+        attackList.Clear();
+
+        if (team == Team.White)
+        {
+            CheckAttackLimitation(xPos + 1, zPos + 1);
+            CheckAttackLimitation(xPos - 1, zPos + 1);
+        }
+        else
+        {
+            CheckAttackLimitation(xPos + 1, zPos - 1);
+            CheckAttackLimitation(xPos - 1, zPos - 1);
+        }
+
+        return attackList;
+    }
     public override void MoveTo(int x, int z)
     {
         base.MoveTo(x, z);
         isFirstMoving = false;
     }
-    private new bool CheckMovingAndAttackLimitation(int x, int z)
+    private bool CheckMovingLimitation(int x, int z)
     {
         if (x < 0 || x >= Board.X_COUNT || z < 0 || z >= Board.Y_COUNT) return false;
 
         if (gameBoard.board[x, z].figure != null)
-        {
-            if (gameBoard.board[x, z].figure.team == team) return false;
-            else return false;
-        }
+            return false;
 
         return true;
+    }
+
+    private bool CheckAttackLimitation(int x, int z)
+    {
+        if (x < 0 || x >= Board.X_COUNT || z < 0 || z >= Board.Y_COUNT) return false;
+        if(gameBoard.board[x,z].figure != null && gameBoard.board[x, z].figure.team != team)
+        {
+            attackList.Add(gameBoard.board[x, z]);
+            return true;
+        }
+        return false;
     }
 }

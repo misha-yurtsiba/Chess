@@ -22,15 +22,13 @@ public abstract class Figure : MonoBehaviour
         this.team = team;
     }
 
-    
-
     public abstract List<Tile> GetMoveTiles();
-    public List<Tile> GetAttackTiles()
+    public virtual List<Tile> GetAttackTiles()
     {
         return attackList;
     }
 
-    virtual protected bool CheckMovingAndAttackLimitation(int x, int z)
+    protected bool CheckMovingAndAttackLimitation(int x, int z)
     {
         if (x < 0 || x >= Board.X_COUNT || z < 0 || z >= Board.Y_COUNT) return false;
 

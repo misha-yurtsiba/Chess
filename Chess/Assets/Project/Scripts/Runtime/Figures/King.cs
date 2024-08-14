@@ -8,6 +8,6 @@ public class King : Figure
 
     public override List<Tile> GetMoveTiles()
     {
-        throw new System.NotImplementedException();
+        return movingList;
     }
 }

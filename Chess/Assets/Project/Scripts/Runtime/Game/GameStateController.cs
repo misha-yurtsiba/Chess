@@ -7,6 +7,7 @@ public class GameStateController : MonoBehaviour
 {
     private InputHandler inputHandler;
     private Camera camera;
+    private CheckAndMateController checkAndMateController;
 
     [HideInInspector] public GameStateBase curentGameState;
     [HideInInspector] public WaitPlayerInputState waitPlayerInputState;
@@ -16,16 +17,17 @@ public class GameStateController : MonoBehaviour
     [HideInInspector] public Team curentMovingTeam;
 
     [Inject]
-    private void Construct(InputHandler inputHandler)
+    private void Construct(InputHandler inputHandler, CheckAndMateController checkAndMateController)
     {
         this.inputHandler = inputHandler;
+        this.checkAndMateController = checkAndMateController;
     }
     void Start()
     {
         camera = Camera.main;
 
         waitPlayerInputState = new WaitPlayerInputState(inputHandler,this,camera);
-        figureMoveState = new FigureMoveState(inputHandler,this,camera);
+        figureMoveState = new FigureMoveState(inputHandler,this,camera, checkAndMateController);
 
         curentMovingTeam = Team.White;
 
@@ -43,6 +45,5 @@ public class GameStateController : MonoBehaviour
         curentGameState?.Exit();
         curentGameState = newState;
         curentGameState.Enter();
-        Debug.Log($"{curentGameState} + {curentMovingTeam}");
     }
 }
