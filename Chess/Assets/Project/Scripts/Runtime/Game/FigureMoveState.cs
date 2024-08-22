@@ -25,21 +25,16 @@ public class FigureMoveState : GameStateBase
         activeTile = stateController.activeTile;
 
         activeTile.SelectMarkerSetActive(true);
-        figurePathList = checkAndMateController.GetFigurePath(activeTile.figure, activeTile, activeTile.figure.GetMoveTiles());
-        figureAttackList = activeTile.figure.GetAttackTiles();
+        figurePathList = checkAndMateController.GetFigurePath(activeTile.figure, activeTile);
+        figureAttackList = checkAndMateController.GetAttackTiles(activeTile.figure);
         
         if(figurePathList != null)
-        {
             foreach (Tile tile in figurePathList)           
                 tile.MoveMarkerSetActive(true);
-            
-        }
 
-        if(figureAttackList != null)
-        {
+        if (figureAttackList != null)
             foreach (Tile tile in figureAttackList)
                 tile.AttackMarkerSetActive(true);
-        }
 
         inputHandler.playetTouched += PlayerTouch;
     }
@@ -51,6 +46,7 @@ public class FigureMoveState : GameStateBase
         
         foreach (Tile tile in figureAttackList)
             tile.AttackMarkerSetActive(false);
+        
 
         figurePathList.Clear();
         figureAttackList.Clear();
@@ -68,25 +64,28 @@ public class FigureMoveState : GameStateBase
         Ray ray = camera.ScreenPointToRay(vector2);
         RaycastHit hitInfo;
 
-        if (Physics.Raycast(ray, out hitInfo, 100))
+        if (Physics.Raycast(ray, out hitInfo, 100) && hitInfo.transform.TryGetComponent(out Tile touchedTile))
         {
-            if (hitInfo.transform.TryGetComponent(out Tile touchedTile))
+            if (touchedTile.HasFigure())
             {
-                if(touchedTile.HasFigure())
+                if (touchedTile.figure.team == activeTile.figure.team)
                 {
-                    if(touchedTile.figure.team == activeTile.figure.team)
+                    if(touchedTile.figure == activeTile.figure)
                     {
-                        stateController.activeTile.SelectMarkerSetActive(false);
-                        stateController.activeTile = touchedTile;
-                        stateController.ChangeState(stateController.figureMoveState);
+                        activeTile.SelectMarkerSetActive(false);
+                        stateController.ChangeState(stateController.waitPlayerInputState);
                         return;
                     }
-                    else                    
-                        FigureAttack(touchedTile);                   
+                    stateController.activeTile.SelectMarkerSetActive(false);
+                    stateController.activeTile = touchedTile;
+                    stateController.ChangeState(stateController.figureMoveState);
+                    return;
                 }
-                else               
-                    MoveFigure(touchedTile);               
+                else
+                    FigureAttack(touchedTile);
             }
+            else
+                MoveFigure(touchedTile);
         }
     }
 
@@ -96,15 +95,7 @@ public class FigureMoveState : GameStateBase
         {
             if (touchedTile == tile)
             {
-                activeTile.figure.MoveTo(touchedTile.xPos, touchedTile.zPos);
-                activeTile.SelectMarkerSetActive(false);                
-                ChangeTeam();
-
-                touchedTile.figure = activeTile.figure;
-                stateController.activeTile.figure = null;
-
-                stateController.ChangeState(stateController.waitPlayerInputState);
-
+                ChangeFigurePosition(touchedTile);
                 return;
             }
         }
@@ -119,15 +110,10 @@ public class FigureMoveState : GameStateBase
         {
             if(touchedTile == tile)
             {
-                activeTile.figure.MoveTo(touchedTile.xPos, touchedTile.zPos);
-                activeTile.SelectMarkerSetActive(false);
-                ChangeTeam();
-
+                checkAndMateController.RemoveFigure(touchedTile.figure);
                 Object.Destroy(touchedTile.figure.gameObject);
-                touchedTile.figure = activeTile.figure;
-                stateController.activeTile.figure = null;
 
-                stateController.ChangeState(stateController.waitPlayerInputState);
+                ChangeFigurePosition(touchedTile);
 
                 return;
             }
@@ -136,6 +122,22 @@ public class FigureMoveState : GameStateBase
         stateController.ChangeState(stateController.waitPlayerInputState);
     }
 
+    private void ChangeFigurePosition(Tile touchedTile)
+    {
+        activeTile.figure.MoveTo(touchedTile.xPos, touchedTile.zPos);
+        activeTile.SelectMarkerSetActive(false);
+        ChangeTeam();
+
+        touchedTile.figure = activeTile.figure;
+        stateController.activeTile.figure = null;
+
+        foreach (Tile tile in figureAttackList)
+            tile.AttackMarkerSetActive(false);
+
+        checkAndMateController.IsKingAttacked(touchedTile.figure);
+
+        stateController.ChangeState(stateController.waitPlayerInputState);
+    }
     private void ChangeTeam()
     {
         stateController.curentMovingTeam = (stateController.curentMovingTeam == Team.White)

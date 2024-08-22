@@ -45,5 +45,6 @@ public class GameStateController : MonoBehaviour
         curentGameState?.Exit();
         curentGameState = newState;
         curentGameState.Enter();
+        Debug.Log(curentGameState);
     }
 }

@@ -68,8 +68,13 @@ public class FigureGenerator  : IFigureGeneator
             checkAndMateController.whiteFigures.Add(figure);
         }
 
+
         figure.Init(xPos, zPos, board, team);
         board.board[xPos, zPos].team = team;
         board.board[xPos, zPos].figure = figure;
+
+        if (figure is King)
+            checkAndMateController.SetKing((King)figure);
+
     }
 }
