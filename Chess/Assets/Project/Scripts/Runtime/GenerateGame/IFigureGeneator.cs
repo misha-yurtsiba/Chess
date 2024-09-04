@@ -1,4 +1,4 @@
 ﻿public interface IFigureGeneator
 {
-    public void GenerateFigures() { }
+    public void GenerateFigures();
 }

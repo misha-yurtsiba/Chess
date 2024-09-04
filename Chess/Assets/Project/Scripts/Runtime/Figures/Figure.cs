@@ -14,6 +14,7 @@ public abstract class Figure : MonoBehaviour
     protected List<Tile> movingList = new List<Tile>(); 
     protected List<Tile> attackList = new List<Tile>();
     protected List<Tile> attackSimulatedList = new List<Tile>();
+    protected List<Tile> moveSimulatedList = new List<Tile>();
 
     public void Init(int x,int z, Board board, Team team)
     {
@@ -24,6 +25,18 @@ public abstract class Figure : MonoBehaviour
     }
 
     public abstract List<Tile> GetMoveTiles();
+    public List<Tile> GetSimulatedMoveTiles()
+    {
+        moveSimulatedList.Clear();
+        List<Tile> curentMoweTiles = movingList;
+        GetMoveTiles();
+
+        foreach (Tile tile in movingList)
+            moveSimulatedList.Add(tile);
+
+        movingList = curentMoweTiles;
+        return attackSimulatedList;
+    }
     public virtual List<Tile> GetAttackTiles()
     {
         GetMoveTiles();
@@ -33,10 +46,12 @@ public abstract class Figure : MonoBehaviour
     public List<Tile> GetSimulatedAttackTiles()
     {
         attackSimulatedList.Clear();
+        List<Tile> curentAttackTiles = attackList;
 
         foreach (Tile tile in attackList)
             attackSimulatedList.Add(tile);
 
+        attackList = curentAttackTiles;
         return attackSimulatedList;
     }
     public virtual void MoveTo(int x, int z)
@@ -71,6 +86,5 @@ public abstract class Figure : MonoBehaviour
             movingList.Add(gameBoard.board[x, z]);
     }
     
-
     public void Lose() { }
 }

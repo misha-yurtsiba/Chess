@@ -19,6 +19,15 @@ public class Tile : MonoBehaviour
         xPos = x;
         zPos = z;
     }
+
+    public void ResetValue()
+    {
+        figure = null;
+
+        SelectMarkerSetActive(false);
+        MoveMarkerSetActive(false);
+        AttackMarkerSetActive(false);
+    }
     public void SelectMarkerSetActive(bool active)
     {
         selectSprite.gameObject.SetActive(active);

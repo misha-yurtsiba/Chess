@@ -7,47 +7,35 @@ public class FigureMoveState : GameStateBase
     private InputHandler inputHandler;
     private Camera camera;
     private GameStateController stateController;
-    private CheckAndMateController checkAndMateController;
+    private CheckController checkController;
 
     private Tile activeTile;
     private List<Tile> figurePathList;
     private List<Tile> figureAttackList;
 
-    public FigureMoveState(InputHandler inputHandler, GameStateController stateController, Camera camera, CheckAndMateController checkAndMateController)
+    public FigureMoveState(InputHandler inputHandler, GameStateController stateController, Camera camera, CheckController checkController)
     {
         this.inputHandler = inputHandler;
         this.stateController = stateController;
         this.camera = camera;
-        this.checkAndMateController = checkAndMateController;
+        this.checkController = checkController;
     }
     public override void Enter()
     {
         activeTile = stateController.activeTile;
 
         activeTile.SelectMarkerSetActive(true);
-        figurePathList = checkAndMateController.GetFigurePath(activeTile.figure, activeTile);
-        figureAttackList = checkAndMateController.GetAttackTiles(activeTile.figure);
+        figurePathList = checkController.GetFigurePath(activeTile.figure);
+        figureAttackList = checkController.GetAttackTiles(activeTile.figure);
         
-        if(figurePathList != null)
-            foreach (Tile tile in figurePathList)           
-                tile.MoveMarkerSetActive(true);
-
-        if (figureAttackList != null)
-            foreach (Tile tile in figureAttackList)
-                tile.AttackMarkerSetActive(true);
+        ActiveFigureTiles(true);
 
         inputHandler.playetTouched += PlayerTouch;
     }
 
     public override void Exit()
     {
-        foreach(Tile tile in figurePathList)
-            tile.MoveMarkerSetActive(false);
-        
-        foreach (Tile tile in figureAttackList)
-            tile.AttackMarkerSetActive(false);
-        
-
+        ActiveFigureTiles(false);
         figurePathList.Clear();
         figureAttackList.Clear();
 
@@ -110,7 +98,7 @@ public class FigureMoveState : GameStateBase
         {
             if(touchedTile == tile)
             {
-                checkAndMateController.RemoveFigure(touchedTile.figure);
+                checkController.RemoveFigure(touchedTile.figure);
                 Object.Destroy(touchedTile.figure.gameObject);
 
                 ChangeFigurePosition(touchedTile);
@@ -131,12 +119,18 @@ public class FigureMoveState : GameStateBase
         touchedTile.figure = activeTile.figure;
         stateController.activeTile.figure = null;
 
-        foreach (Tile tile in figureAttackList)
-            tile.AttackMarkerSetActive(false);
-
-        checkAndMateController.IsKingAttacked(touchedTile.figure);
-
+        ActiveFigureTiles(false);
         stateController.ChangeState(stateController.waitPlayerInputState);
+
+        checkController.IsKingAttacked(touchedTile.figure);
+    }
+
+    private void ActiveFigureTiles(bool isActive)
+    {
+        foreach (Tile tile in figurePathList)
+            tile.MoveMarkerSetActive(isActive);
+        foreach (Tile tile in figureAttackList)
+            tile.AttackMarkerSetActive(isActive);
     }
     private void ChangeTeam()
     {

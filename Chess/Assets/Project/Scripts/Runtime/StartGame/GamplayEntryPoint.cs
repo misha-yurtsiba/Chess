@@ -2,26 +2,36 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Zenject;
-
-public class GamplayEntryPoint : MonoBehaviour
+public class GamplayEntryPoint : MonoBehaviour , IEntryPoint
 {
-    private Board board;
+    private CheckController checkController;
+    private Checkmate checkmate;
     private ITileGenerator tileGenerator;
     private IFigureGeneator figureGeneator;
+    private RestartGame restart;
 
     [Inject]
-    private void Construct(Board board, ITileGenerator tileGenerator, IFigureGeneator figureGeneator)
+    private void Construct(ITileGenerator tileGenerator, IFigureGeneator figureGeneator, CheckController checkController, Checkmate checkmate, RestartGame restart)
     {
-        this.board = board;
         this.tileGenerator = tileGenerator;
         this.figureGeneator = figureGeneator;
+        this.checkController = checkController;
+        this.checkmate = checkmate;
+        this.restart = restart;
     }
     void Start()
     {
-        tileGenerator.GenerateTiles(board);
-        figureGeneator.GenerateFigures();
+        tileGenerator.GenerateTiles();
+        checkmate.Init(checkController);
+        restart.Init(this);
+        
+        StartGame();
 
     }
 
+    public void StartGame()
+    {
+        figureGeneator.GenerateFigures();   
+    }
 
 }

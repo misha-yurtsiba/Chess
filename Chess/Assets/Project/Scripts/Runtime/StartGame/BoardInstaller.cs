@@ -7,16 +7,19 @@ public class BoardInstaller : MonoInstaller
     [SerializeField] private Board boardPrefab;
     [SerializeField] private Tile tilePrefab;
     [SerializeField] private FigureConfig figureConfig;
+    [SerializeField] private GamplayEntryPoint gamplayEntryPoint;
 
     public override void InstallBindings()
     {
         BoardBind();
         BindTile();
+        RestartGameBind();
         BoardGeneratorBind();
         FigureConfigBind();
+        CheckmateBind();
         CheckAndMateControllerBind();
         FigureGeneratorBind();
-        
+        GameEntryPointBind();
     }
     private void BoardBind()
     {
@@ -55,10 +58,17 @@ public class BoardInstaller : MonoInstaller
     {
 
         Container
-            .BindInterfacesAndSelfTo<CheckAndMateController>()
+            .BindInterfacesAndSelfTo<CheckController>()
             .AsSingle()
             .NonLazy();
         Debug.Log(111);
+    }
+    private void CheckmateBind()
+    {
+        Container
+            .BindInterfacesAndSelfTo<Checkmate>()
+            .AsSingle()
+            .NonLazy();
     }
 
 
@@ -66,6 +76,23 @@ public class BoardInstaller : MonoInstaller
     {
         Container
             .BindInterfacesAndSelfTo<FigureGenerator>()
+            .AsSingle()
+            .NonLazy();
+    }
+
+    private void RestartGameBind()
+    {
+        Container
+            .BindInterfacesAndSelfTo<RestartGame>()
+            .AsSingle()
+            .NonLazy();
+    }
+
+    private void GameEntryPointBind()
+    {
+        Container
+            .BindInterfacesAndSelfTo<GamplayEntryPoint>()
+            .FromInstance(gamplayEntryPoint)
             .AsSingle()
             .NonLazy();
     }

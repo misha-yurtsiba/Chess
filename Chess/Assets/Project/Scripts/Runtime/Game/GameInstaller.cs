@@ -6,9 +6,11 @@ using Zenject;
 public class GameInstaller : MonoInstaller
 {
     [SerializeField] private InputHandler inputHandler;
+    [SerializeField] private GameplayUIController gameplayUIController;
     public override void InstallBindings()
     {
         InputHandlerBind();
+        GameplayUIControlerBind();
     }
 
     private void InputHandlerBind()
@@ -19,4 +21,15 @@ public class GameInstaller : MonoInstaller
             .AsSingle()
             .NonLazy();
     }
+
+    private void GameplayUIControlerBind()
+    {
+        Container
+            .Bind<GameplayUIController>()
+            .FromInstance(gameplayUIController)
+            .AsSingle()
+            .NonLazy();
+    }
+
+    
 }

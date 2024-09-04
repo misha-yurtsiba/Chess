@@ -7,22 +7,23 @@ public class FigureGenerator  : IFigureGeneator
     private FigureConfig figureConfig;
     private Board board;
     private DiContainer diContainer;
-    private CheckAndMateController checkAndMateController;
+    private CheckController checkController;
 
     private Dictionary<FigureType,FigureData> figureDict = new Dictionary<FigureType, FigureData>();
-    public FigureGenerator(FigureConfig figureConfig, Board board, DiContainer diContainer, CheckAndMateController checkAndMateController)
+    public FigureGenerator(FigureConfig figureConfig, Board board, DiContainer diContainer, CheckController checkController)
     {
         this.figureConfig = figureConfig;
         this.board = board;
         this.diContainer = diContainer;
-        this.checkAndMateController = checkAndMateController;
+        this.checkController = checkController;
     }
 
     public void GenerateFigures()
     {
         foreach (FigureData figureData in figureConfig.data)
         {
-            figureDict.Add(figureData.figureType, figureData);
+            if(!figureDict.ContainsKey(figureData.figureType))
+                figureDict.Add(figureData.figureType, figureData);
         }
 
         for (int i = 0; i < Board.X_COUNT; i++)
@@ -60,12 +61,12 @@ public class FigureGenerator  : IFigureGeneator
         {
             figure.GetComponent<MeshRenderer>().material = figureDict[figureType].darkMaterial;
             figure.transform.rotation = Quaternion.Euler(0,180,0);
-            checkAndMateController.blackFigures.Add(figure);
+            checkController.blackFigures.Add(figure);
         }
         else
         {
             figure.GetComponent<MeshRenderer>().material = figureDict[figureType].lightMaterial;
-            checkAndMateController.whiteFigures.Add(figure);
+            checkController.whiteFigures.Add(figure);
         }
 
 
@@ -74,7 +75,7 @@ public class FigureGenerator  : IFigureGeneator
         board.board[xPos, zPos].figure = figure;
 
         if (figure is King)
-            checkAndMateController.SetKing((King)figure);
+            checkController.SetKing((King)figure);
 
     }
 }
