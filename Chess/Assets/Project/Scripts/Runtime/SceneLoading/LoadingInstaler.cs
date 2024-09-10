@@ -9,6 +9,7 @@ public class LoadingInstaler : MonoInstaller
     {
         BindLoadingUI();
         BindSceneLoadaig();
+        BindGameTime();
     }
 
     private void BindLoadingUI()
@@ -24,6 +25,14 @@ public class LoadingInstaler : MonoInstaller
     {
         Container
             .BindInterfacesAndSelfTo<SceneLoader>()
+            .AsSingle()
+            .NonLazy();
+    }
+
+    private void BindGameTime()
+    {
+        Container
+            .BindInterfacesAndSelfTo<GameTime>()
             .AsSingle()
             .NonLazy();
     }

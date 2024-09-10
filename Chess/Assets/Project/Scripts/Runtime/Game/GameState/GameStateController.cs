@@ -9,6 +9,7 @@ public class GameStateController : MonoBehaviour
     private Camera camera;
     private CheckController checkAndMateController;
     private Checkmate checkmate;
+    private TimerController timerController;
     private IRestart restartGame;
 
     [HideInInspector] public GameStateBase curentGameState;
@@ -20,12 +21,13 @@ public class GameStateController : MonoBehaviour
     [HideInInspector] public Team curentMovingTeam;
 
     [Inject]
-    private void Construct(InputHandler inputHandler, CheckController checkAndMateController, Checkmate checkmate, IRestart restartGame)
+    private void Construct(InputHandler inputHandler, CheckController checkAndMateController, Checkmate checkmate, TimerController timerController, IRestart restartGame)
     {
         this.checkmate = checkmate;
         this.inputHandler = inputHandler;
         this.checkAndMateController = checkAndMateController;
         this.restartGame = restartGame;
+        this.timerController = timerController;
     }
     void Start()
     {
@@ -36,6 +38,7 @@ public class GameStateController : MonoBehaviour
         figureMoveState = new FigureMoveState(inputHandler,this,camera, checkAndMateController);
 
         curentMovingTeam = Team.White;
+        timerController.RestartTimers();
 
         ChangeState(waitPlayerInputState);
     }
@@ -43,16 +46,20 @@ public class GameStateController : MonoBehaviour
     private void OnEnable()
     {
         checkmate.checkmate += Lose;
+        timerController.timeOver += Lose;
         restartGame.restart += ResetState;
     }
     private void OnDisable()
     {
         checkmate.checkmate -= Lose;
+        timerController.timeOver -= Lose;
         restartGame.restart -= ResetState;
+
     }
     void Update()
     {
         curentGameState.Update();
+        timerController.UpdateTimer();
     }
 
     public void ChangeState(GameStateBase newState)
@@ -68,5 +75,11 @@ public class GameStateController : MonoBehaviour
     {
         curentMovingTeam = Team.White;
         ChangeState(waitPlayerInputState);
+    }
+
+    public void ChangeTeam()
+    {
+        curentMovingTeam = (curentMovingTeam == Team.White) ? Team.Black : Team.White;
+        timerController.ChangeTimer();
     }
 }

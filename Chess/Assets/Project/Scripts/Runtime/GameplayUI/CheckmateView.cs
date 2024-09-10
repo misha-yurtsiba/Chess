@@ -1,6 +1,7 @@
 using UnityEngine;
 using UnityEngine.UI;
 using Zenject;
+using TMPro;
 
 public class CheckmateView : MonoBehaviour
 {
@@ -8,6 +9,7 @@ public class CheckmateView : MonoBehaviour
     [SerializeField] private Button closeButton;
     [SerializeField] private Button restartButton;
     [SerializeField] private Button exitButton;
+    [SerializeField] private TextMeshProUGUI titleText;
 
     private GameplayUIController gameplayUIController;
 
@@ -22,8 +24,9 @@ public class CheckmateView : MonoBehaviour
         restartButton.onClick.AddListener(gameplayUIController.Restart);
     }
 
-    public void ShowWiner(Team team)
+    public void ShowWiner(Team team, string title)
     {
         winerTeamImage.color = (team == Team.White) ? Color.white : Color.black;
+        titleText.text = title;
     }
 }

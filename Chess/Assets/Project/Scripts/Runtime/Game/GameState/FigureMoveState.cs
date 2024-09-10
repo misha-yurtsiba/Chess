@@ -114,7 +114,7 @@ public class FigureMoveState : GameStateBase
     {
         activeTile.figure.MoveTo(touchedTile.xPos, touchedTile.zPos);
         activeTile.SelectMarkerSetActive(false);
-        ChangeTeam();
+        stateController.ChangeTeam();
 
         touchedTile.figure = activeTile.figure;
         stateController.activeTile.figure = null;
@@ -132,9 +132,5 @@ public class FigureMoveState : GameStateBase
         foreach (Tile tile in figureAttackList)
             tile.AttackMarkerSetActive(isActive);
     }
-    private void ChangeTeam()
-    {
-        stateController.curentMovingTeam = (stateController.curentMovingTeam == Team.White)
-                    ? Team.Black : Team.White;
-    }
+    
 }

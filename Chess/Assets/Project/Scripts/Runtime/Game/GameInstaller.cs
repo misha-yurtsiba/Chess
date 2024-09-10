@@ -11,6 +11,7 @@ public class GameInstaller : MonoInstaller
     {
         InputHandlerBind();
         GameplayUIControlerBind();
+        TimerControllerBind();
     }
 
     private void InputHandlerBind()
@@ -30,6 +31,12 @@ public class GameInstaller : MonoInstaller
             .AsSingle()
             .NonLazy();
     }
-
+    private void TimerControllerBind()
+    {
+        Container
+            .BindInterfacesAndSelfTo<TimerController>()
+            .AsSingle()
+            .NonLazy();
+    }
     
 }

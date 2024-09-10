@@ -6,6 +6,7 @@ public class MainMenu : MonoBehaviour
 {
     [SerializeField] private Button startButton;
     [SerializeField] private Button quitButton;
+    [SerializeField] private SelectTimeView selectTimeView;
 
     private ISceneLoader sceneLoader;
 
@@ -18,11 +19,12 @@ public class MainMenu : MonoBehaviour
     {
         startButton.onClick.AddListener(StartGame);
         quitButton.onClick.AddListener(QuitGame);
+        selectTimeView.closeButton.onClick.AddListener(() => selectTimeView.gameObject.SetActive(false));
     }
 
     private void StartGame()
     {
-        sceneLoader.LoadScene(SceneName.Gameplay.ToString());
+        selectTimeView.gameObject.SetActive(true);
     }
     private void QuitGame()
     {
