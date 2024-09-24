@@ -16,11 +16,13 @@ public class WaitPlayerInputState : GameStateBase
     public override void Enter()
     {
         inputHandler.playetTouched += PlayerTouch;
+        inputHandler.startPress += StartDrag;
     }
 
     public override void Exit()
     {
         inputHandler.playetTouched -= PlayerTouch;
+        inputHandler.startPress -= StartDrag;
 
     }
 
@@ -29,21 +31,34 @@ public class WaitPlayerInputState : GameStateBase
         
     }
 
-    private void PlayerTouch(Vector2 vector2)
+    private void PlayerTouch(Vector2 mousePosition)
     {
-        Ray ray = camera.ScreenPointToRay(vector2);
+        if (IsPlayerTouchTile(mousePosition))
+            stateController.ChangeState(stateController.figureMoveState);
+    }
+
+    private void StartDrag(Vector2 mousePosition)
+    {
+        if (IsPlayerTouchTile(mousePosition))
+        {
+            stateController.ChangeState(stateController.figureDragAndDropState);
+            stateController.startMousePosition = mousePosition;
+        }
+    }
+
+    private bool IsPlayerTouchTile(Vector2 mousePosition)
+    {
+        Ray ray = camera.ScreenPointToRay(mousePosition);
         RaycastHit hitInfo;
 
         if (Physics.Raycast(ray, out hitInfo, 100))
         {
-            if(hitInfo.transform.TryGetComponent(out Tile tile))
+            if (hitInfo.transform.TryGetComponent(out Tile tile) && tile.HasFigure() && tile.figure.team == stateController.curentMovingTeam)
             {
-                if (tile.HasFigure() && tile.figure.team == stateController.curentMovingTeam)
-                {
-                    stateController.activeTile = tile;
-                    stateController.ChangeState(stateController.figureMoveState);
-                }
+                stateController.activeTile = tile;
+                return true;
             }
         }
+        return false;
     }
 }

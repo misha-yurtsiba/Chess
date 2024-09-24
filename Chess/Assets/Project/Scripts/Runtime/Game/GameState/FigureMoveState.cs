@@ -4,14 +4,14 @@ using UnityEngine;
 
 public class FigureMoveState : GameStateBase
 {
-    private InputHandler inputHandler;
-    private Camera camera;
-    private GameStateController stateController;
-    private CheckController checkController;
+    protected InputHandler inputHandler;
+    protected Camera camera;
+    protected GameStateController stateController;
+    protected CheckController checkController;
 
-    private Tile activeTile;
-    private List<Tile> figurePathList;
-    private List<Tile> figureAttackList;
+    protected Tile activeTile;
+    protected List<Tile> figurePathList;
+    protected List<Tile> figureAttackList;
 
     public FigureMoveState(InputHandler inputHandler, GameStateController stateController, Camera camera, CheckController checkController)
     {
@@ -31,15 +31,20 @@ public class FigureMoveState : GameStateBase
         ActiveFigureTiles(true);
 
         inputHandler.playetTouched += PlayerTouch;
+        inputHandler.startPress += StartDrag;
+
     }
 
     public override void Exit()
     {
         ActiveFigureTiles(false);
+        activeTile.SelectMarkerSetActive(false);
         figurePathList.Clear();
         figureAttackList.Clear();
 
         inputHandler.playetTouched -= PlayerTouch;
+        inputHandler.startPress -= StartDrag;
+
     }
 
     public override void Update()
@@ -76,23 +81,46 @@ public class FigureMoveState : GameStateBase
                 MoveFigure(touchedTile);
         }
     }
+    private bool IsPlayerTouchTile(Vector2 mousePosition)
+    {
+        Ray ray = camera.ScreenPointToRay(mousePosition);
+        RaycastHit hitInfo;
 
-    private void MoveFigure(Tile touchedTile)
+        if (Physics.Raycast(ray, out hitInfo, 100))
+        {
+            if (hitInfo.transform.TryGetComponent(out Tile tile) && tile.HasFigure() && tile.figure.team == stateController.curentMovingTeam)
+            {
+                stateController.activeTile = tile;
+                return true;
+            }
+        }
+        return false;
+    }
+    private void StartDrag(Vector2 mousePosition)
+    {
+        if (IsPlayerTouchTile(mousePosition))
+        {
+            stateController.ChangeState(stateController.figureDragAndDropState);
+            stateController.startMousePosition = mousePosition;
+        }
+    }
+
+    protected bool MoveFigure(Tile touchedTile)
     {
         foreach (Tile tile in figurePathList)
         {
             if (touchedTile == tile)
             {
                 ChangeFigurePosition(touchedTile);
-                return;
+                return true;
             }
         }
         activeTile.SelectMarkerSetActive(false);
         stateController.ChangeState(stateController.waitPlayerInputState);
-
+        return false;
     }
 
-    private void FigureAttack(Tile touchedTile)
+    protected bool FigureAttack(Tile touchedTile)
     {
         foreach(Tile tile in figureAttackList)
         {
@@ -103,14 +131,15 @@ public class FigureMoveState : GameStateBase
 
                 ChangeFigurePosition(touchedTile);
 
-                return;
+                return true;
             }
         }
         activeTile.SelectMarkerSetActive(false);
         stateController.ChangeState(stateController.waitPlayerInputState);
+        return false;
     }
 
-    private void ChangeFigurePosition(Tile touchedTile)
+    protected void ChangeFigurePosition(Tile touchedTile)
     {
         activeTile.figure.MoveTo(touchedTile.xPos, touchedTile.zPos);
         activeTile.SelectMarkerSetActive(false);
@@ -132,5 +161,4 @@ public class FigureMoveState : GameStateBase
         foreach (Tile tile in figureAttackList)
             tile.AttackMarkerSetActive(isActive);
     }
-    
 }

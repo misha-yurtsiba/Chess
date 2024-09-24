@@ -5,6 +5,7 @@ using Zenject;
 
 public class GameStateController : MonoBehaviour
 {
+    [SerializeField] private float yOffset;
     private InputHandler inputHandler;
     private Camera camera;
     private CheckController checkAndMateController;
@@ -16,9 +17,11 @@ public class GameStateController : MonoBehaviour
     [HideInInspector] public WaitPlayerInputState waitPlayerInputState;
     [HideInInspector] public PlayerLoseState playerLoseState;
     [HideInInspector] public FigureMoveState figureMoveState;
+    [HideInInspector] public FigureDragAndDropState figureDragAndDropState;
 
     [HideInInspector] public Tile activeTile;
     [HideInInspector] public Team curentMovingTeam;
+    [HideInInspector] public Vector2 startMousePosition;
 
     [Inject]
     private void Construct(InputHandler inputHandler, CheckController checkAndMateController, Checkmate checkmate, TimerController timerController, IRestart restartGame)
@@ -36,6 +39,7 @@ public class GameStateController : MonoBehaviour
         playerLoseState = new PlayerLoseState();
         waitPlayerInputState = new WaitPlayerInputState(inputHandler,this,camera);
         figureMoveState = new FigureMoveState(inputHandler,this,camera, checkAndMateController);
+        figureDragAndDropState = new FigureDragAndDropState(inputHandler,this,camera,checkAndMateController,yOffset);
 
         curentMovingTeam = Team.White;
         timerController.RestartTimers();
@@ -60,6 +64,8 @@ public class GameStateController : MonoBehaviour
     {
         curentGameState.Update();
         timerController.UpdateTimer();
+
+        if (Input.GetKeyDown(KeyCode.O)) ChangeState(figureDragAndDropState);
     }
 
     public void ChangeState(GameStateBase newState)
@@ -82,4 +88,6 @@ public class GameStateController : MonoBehaviour
         curentMovingTeam = (curentMovingTeam == Team.White) ? Team.Black : Team.White;
         timerController.ChangeTimer();
     }
+
+
 }

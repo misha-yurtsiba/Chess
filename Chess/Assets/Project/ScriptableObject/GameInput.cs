@@ -35,6 +35,24 @@ public partial class @GameInput : IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": true
+                },
+                {
+                    ""name"": ""Press"",
+                    ""type"": ""Button"",
+                    ""id"": ""aa8f45e4-e79e-4d4b-8dd6-63f6aaa2764f"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": ""Press(behavior=2)"",
+                    ""initialStateCheck"": true
+                },
+                {
+                    ""name"": ""Position"",
+                    ""type"": ""PassThrough"",
+                    ""id"": ""b5dcc777-468d-44db-9537-0ab4a813dc32"",
+                    ""expectedControlType"": ""Vector2"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": true
                 }
             ],
             ""bindings"": [
@@ -81,6 +99,28 @@ public partial class @GameInput : IInputActionCollection2, IDisposable
                     ""action"": ""Click"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""9ce509ec-29fa-4f6f-b2db-d9df9f1b7ddf"",
+                    ""path"": ""<Touchscreen>/Press"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Press"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""a76eff19-e8dd-4f4f-9b9a-e11316159382"",
+                    ""path"": ""<Touchscreen>/primaryTouch/position"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Position"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
                 }
             ]
         },
@@ -118,6 +158,8 @@ public partial class @GameInput : IInputActionCollection2, IDisposable
         // Gameplay
         m_Gameplay = asset.FindActionMap("Gameplay", throwIfNotFound: true);
         m_Gameplay_Click = m_Gameplay.FindAction("Click", throwIfNotFound: true);
+        m_Gameplay_Press = m_Gameplay.FindAction("Press", throwIfNotFound: true);
+        m_Gameplay_Position = m_Gameplay.FindAction("Position", throwIfNotFound: true);
         // UI
         m_UI = asset.FindActionMap("UI", throwIfNotFound: true);
         m_UI_Newaction = m_UI.FindAction("New action", throwIfNotFound: true);
@@ -181,11 +223,15 @@ public partial class @GameInput : IInputActionCollection2, IDisposable
     private readonly InputActionMap m_Gameplay;
     private IGameplayActions m_GameplayActionsCallbackInterface;
     private readonly InputAction m_Gameplay_Click;
+    private readonly InputAction m_Gameplay_Press;
+    private readonly InputAction m_Gameplay_Position;
     public struct GameplayActions
     {
         private @GameInput m_Wrapper;
         public GameplayActions(@GameInput wrapper) { m_Wrapper = wrapper; }
         public InputAction @Click => m_Wrapper.m_Gameplay_Click;
+        public InputAction @Press => m_Wrapper.m_Gameplay_Press;
+        public InputAction @Position => m_Wrapper.m_Gameplay_Position;
         public InputActionMap Get() { return m_Wrapper.m_Gameplay; }
         public void Enable() { Get().Enable(); }
         public void Disable() { Get().Disable(); }
@@ -198,6 +244,12 @@ public partial class @GameInput : IInputActionCollection2, IDisposable
                 @Click.started -= m_Wrapper.m_GameplayActionsCallbackInterface.OnClick;
                 @Click.performed -= m_Wrapper.m_GameplayActionsCallbackInterface.OnClick;
                 @Click.canceled -= m_Wrapper.m_GameplayActionsCallbackInterface.OnClick;
+                @Press.started -= m_Wrapper.m_GameplayActionsCallbackInterface.OnPress;
+                @Press.performed -= m_Wrapper.m_GameplayActionsCallbackInterface.OnPress;
+                @Press.canceled -= m_Wrapper.m_GameplayActionsCallbackInterface.OnPress;
+                @Position.started -= m_Wrapper.m_GameplayActionsCallbackInterface.OnPosition;
+                @Position.performed -= m_Wrapper.m_GameplayActionsCallbackInterface.OnPosition;
+                @Position.canceled -= m_Wrapper.m_GameplayActionsCallbackInterface.OnPosition;
             }
             m_Wrapper.m_GameplayActionsCallbackInterface = instance;
             if (instance != null)
@@ -205,6 +257,12 @@ public partial class @GameInput : IInputActionCollection2, IDisposable
                 @Click.started += instance.OnClick;
                 @Click.performed += instance.OnClick;
                 @Click.canceled += instance.OnClick;
+                @Press.started += instance.OnPress;
+                @Press.performed += instance.OnPress;
+                @Press.canceled += instance.OnPress;
+                @Position.started += instance.OnPosition;
+                @Position.performed += instance.OnPosition;
+                @Position.canceled += instance.OnPosition;
             }
         }
     }
@@ -245,6 +303,8 @@ public partial class @GameInput : IInputActionCollection2, IDisposable
     public interface IGameplayActions
     {
         void OnClick(InputAction.CallbackContext context);
+        void OnPress(InputAction.CallbackContext context);
+        void OnPosition(InputAction.CallbackContext context);
     }
     public interface IUIActions
     {
